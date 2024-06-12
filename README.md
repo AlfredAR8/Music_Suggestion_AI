@@ -6,5 +6,7 @@ This project grabs your playlist from spotify and retreive the data of it and pa
 *(The ability to retreive the playlist is not available yet)*
 
 
+Dataset source: https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset
+
 
 > José Alfredo Arriaga Rosillo
