@@ -64,7 +64,8 @@ playlist_songs = []
 if access_token:
     playlist_data = get_playlist_data(access_token, playlist_id)
     if playlist_data:
-        playlist_songs = json.dumps(playlist_data).replace('"', '\\"')
+        playlist_songs = playlist_data["tracks"]["items"][:25]
+        playlist_songs = json.dumps(playlist_songs).replace('"', '\\"')
 
 # Create the assistant
 assistant = client.beta.assistants.create(
