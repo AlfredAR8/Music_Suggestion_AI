@@ -69,7 +69,6 @@ if access_token:
         random.shuffle(songs)  # Shuffle the songs
         playlist_songs = songs[:25]
         playlist_songs = json.dumps(playlist_songs).replace('"', '\\"')
-        print(playlist_songs)
 
 # Create the assistant
 assistant = client.beta.assistants.create(
