@@ -1,15 +1,70 @@
 from openai import OpenAI
 from dotenv import load_dotenv
+import requests
 import os
-import json
 import re
+import json
 
 load_dotenv()
+
+# Set the Spotify playlist ID
+playlist_id = "4OGL14XW0rPSnLy71pWQE5"
 
 # Initialize the OpenAI client with your API key
 api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
+client_id = os.getenv('SPOTIFY_CLIENT_ID')
+client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
 
+
+# Spotify access token request
+def get_access_token(client_id, client_secret):
+    url = "https://accounts.spotify.com/api/token"
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": client_secret
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+
+    if response.status_code == 200:
+        token_data = response.json()
+        access_token = token_data.get("access_token")
+        return access_token
+    else:
+        print("Failed to retrieve token. Status code:", response.status_code)
+        print("Response:", response.json())
+        return None
+
+# Playlist Spotify request
+def get_playlist_data(access_token, playlist_id):
+    url = f'https://api.spotify.com/v1/playlists/{playlist_id}?fields=tracks.items(track(name,artists(name),album(name)))'
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        playlist_data = response.json()
+        return playlist_data
+    else:
+        print("Failed to retrieve playlist data. Status code:", response.status_code)
+        print("Response:", response.json())
+        return None
+
+# Get the access token and playlist data from Spotify
+access_token = get_access_token(client_id, client_secret)
+playlist_songs = []
+
+if access_token:
+    playlist_data = get_playlist_data(access_token, playlist_id)
+    if playlist_data:
+        playlist_songs = json.dumps(playlist_data).replace('"', '\\"')
 
 # Create the assistant
 assistant = client.beta.assistants.create(
@@ -67,18 +122,13 @@ if not uploaded_files:
     print("No files were uploaded successfully.")
     exit(1)
 
-with open('playlist.json', 'r', encoding='utf-8') as file:
-    data = json.load(file)
-
-json_string = json.dumps(data).replace('"', '\\"')
-
 # Create a thread and attach the files to the message
 try:
     thread = client.beta.threads.create(
         messages=[
             {
                 "role": "user",
-                "content": f"Search for the following songs in the database: \n{json_string} For each matched song, look for its “popularity”, “duration_ms”, “explicit”, “danceability”, “energy”, “key”, “loudness”, “mode”, “speechiness”, “acousticness”, “instrumentalness”, “liveness”, “valence”, “tempo”, “time_signature”, and “track_genre” details. Based on these songs and their attributes, identify 5 similar songs from the database that I may like and provide only the name an artist of each song.",
+                "content": f"Search for the following songs in the database: \n{playlist_songs} For each matched song, look for its “popularity”, “duration_ms”, “explicit”, “danceability”, “energy”, “key”, “loudness”, “mode”, “speechiness”, “acousticness”, “instrumentalness”, “liveness”, “valence”, “tempo”, “time_signature”, and “track_genre” details. Based on these songs and their attributes, identify 5 similar songs from the database that I may like and provide only the name an artist of each song.",
                 "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]} for file_id in uploaded_files]
             }
         ]
