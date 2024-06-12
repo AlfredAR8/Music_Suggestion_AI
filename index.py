@@ -69,7 +69,7 @@ if access_token:
 # Create the assistant
 assistant = client.beta.assistants.create(
     name="Music Suggestions",
-    instructions="You are an expert music analyst. Use your knowledge base to answer questions about which song fits more for me. Also just answer only with the song name and song artists for each song you recommend.",
+    instructions="You are an expert music analyst. Use your knowledge base to answer questions about which song fits more for me. Also just answer only with the song name and song artists for each song you recommend, you should not write anything else just the songs. example: 1. Song Name - Artist Name",
     model="gpt-4o",
     tools=[{"type": "file_search"}],
 )
@@ -146,7 +146,6 @@ try:
 
     messages = list(client.beta.threads.messages.list(thread_id=thread.id, run_id=run.id))
     message_content = messages[0].content[0].text
-
 
     message_content = parse_value(f"{message_content}")
     print(message_content)
