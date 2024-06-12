@@ -2,11 +2,10 @@
 
 ## This is work in progress
 
-This project grabs your playlist from spotify and retreive the data of it and parse it with a dataset to give you suggestions of songs based on the energy, instrumental, etc.
-*(The ability to retreive the playlist is not available yet)*
+This project presents a new approach to music recommendations on an app. Using the Spotify API, he retrieves playlists, album artists, and tracks from a playlist. This data is uploaded to the OpenAI API, which analyzes it alongside a music dataset. By evaluating factors such as popularity, duration, danceability, energy, loudness, speechiness, acousticness, instrumentalness, and liveness, the system suggests five songs the user may like. This method offers an innovative way to enhance music recommendation accuracy and user satisfaction.
 
 
-Dataset source: https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset
+_Dataset source:_ https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset
 
 
 > José Alfredo Arriaga Rosillo
