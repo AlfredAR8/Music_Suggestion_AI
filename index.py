@@ -4,6 +4,7 @@ import requests
 import os
 import re
 import json
+import random
 
 load_dotenv()
 
@@ -64,8 +65,11 @@ playlist_songs = []
 if access_token:
     playlist_data = get_playlist_data(access_token, playlist_id)
     if playlist_data:
-        playlist_songs = playlist_data["tracks"]["items"][:25]
+        songs = playlist_data["tracks"]["items"]
+        random.shuffle(songs)  # Shuffle the songs
+        playlist_songs = songs[:25]
         playlist_songs = json.dumps(playlist_songs).replace('"', '\\"')
+        print(playlist_songs)
 
 # Create the assistant
 assistant = client.beta.assistants.create(
